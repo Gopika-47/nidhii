@@ -1,0 +1,31 @@
+from .import views
+from django.urls import path 
+
+urlpatterns=[
+    path('login/',views.user_login,name='login'),
+    path('index/<int:user_id>/',views.index,name='index'),
+    path('logout/', views.logout_view, name='logout'),
+    path('user_reg/<int:user_id>/',views.user_reg,name='user_reg'),
+    path('search_user_names/', views.search_user_names, name='search_user_names'),
+    path('get_users_by_branch/', views.get_users_by_branch, name='get_users_by_branch'),
+    path('change_password/<int:user_id>/',views.change_password,name='change_password'),
+    path('staff_registration/<int:user_id>/',views.staff_registration,name='staff_registration'),
+    path('get_staff_names/<int:user_id>/', views.get_staff_names, name='get_staff_names'),
+    path('account_schedule_form/<int:user_id>/',views.account_schedule_form,name='account_schedule_form'),
+    path('search_account_names/', views.search_account_names, name='search_account_names'),
+    path('sub_ledger/<int:user_id>/',views.sub_ledger,name='sub_ledger'),
+    path('search_sub_account/', views.search_sub_account, name='search_sub_account'),
+    path('search_sub_account_j/', views.search_sub_account_j, name='search_sub_account_j'),
+    path('search_account_code/', views.search_account_code, name='search_account_code'),
+    path('search_s_account_code/',views.search_s_account_code,name='search_s_account_code'),
+    path('search_s_account_name/',views.search_s_account_name,name='search_s_account_name'),
+    path('cash_book_entry/<int:user_id>/',views.cash_book_entry_view,name='cash_book_entry'),
+    path('delete_cash_entry/<int:entry_id>/<int:user_id>/', views.delete_cash_entry, name='delete_cash_entry'),
+    path('search_account_code_daybook/', views.search_account_code_daybook, name='search_account_code_daybook'),
+    path('search_account_names_daybook/', views.search_account_names_daybook, name='search_account_names_daybook'),
+    path('bankbook/<int:user_id>/',views.bankbook,name='bankbook'),
+    path('delete_bank_entry/<int:entry_id>/<int:user_id>/',views.delete_bank_entry,name='delete_bank_entry'),
+    path('journal/<int:user_id>/', views.journal, name='journal'),
+    path('save_journal_entries/<int:user_id>/', views.save_journal_entries, name='save_journal_entries'),
+    path('loop/<int:user_id>/', views.loop, name='loop'),
+]

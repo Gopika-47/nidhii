@@ -1,0 +1,640 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <hr />
+    <div id="tabs">
+      <div class="header">
+        <span>Branch: {{ user.B_id.Branch_name }}</span>
+        <span>User: {{ user.Username }}</span>
+        <span>Date: </span>
+        <span>Time: </span>
+      </div>
+      <ul>
+        <li><a href="{% url 'index' user.id %}"><span>Home</span></a></li>
+        <li class="dropdown">
+          <a href="#"><span>Admin</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'user_reg' user.id %}"><pre> User Registration </pre></a></li>
+            <li><a href="{% url 'change_password' user.id %}"><pre>  Change Password  </pre></a></li>
+            <li><a href="{% url 'staff_registration' user.id %}"><pre>Staff Registration </pre></a></li>
+          </ul>
+        </li>
+        <li><a href="#"><span>Master</span></a></li>
+        <li><a href="#"><span>Deposit</span></a></li>
+        <li><a href="#"><span>Gold Loan</span></a></li>
+        <li class="dropdown">
+          <a href="#"><span>Accounts</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'account_schedule_form' user.id %}"><pre>Account Registration   </pre></a></li>
+            <li><a href="{% url 'sub_ledger' user.id %}"><pre>SubLedger Registration </pre></a></li>
+            <li><a href="{% url 'cash_book_entry' user.id %}"><pre>    Cash Book Entry     </pre></a></li>
+            <li><a href="{% url 'bankbook' user.id %}"><pre>    Bank Book Entry     </pre></a></li>
+            <li><a href="{% url 'journal' user.id %}"><pre>    Journal Entry      </pre></a></li>
+          </ul>
+        </li>
+        <li><a href="#"><span>Loans</span></a></li>
+        <li><a href="{% url 'logout' %}"><span>Logout</span></a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="form-container" style="max-width:1300px;">
+    <div class="data-view">
+      <h2>Bank Book Entry</h2>
+      {% if messages %}
+      <ul style="width: 60%; margin: auto; padding: 10px; list-style: none;">
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+            <script>
+              alert("{{ message }}");
+          </script>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    <div class="form-section">
+      <h2>Transaction Details</h2>
+      <form method="post">
+        <input type="hidden" id="entry_id" name="entry_id">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="inline-form-group">
+          <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" name="date" value="{{ selected_date|date:'Y-m-d' }}" readonly>
+          </div>
+       
+          <div class="form-group" style="flex: 1;">
+            <label style="margin-left: 10px;">Mode</label>
+            <div class="radio-group">
+              <label style="margin-right:30px;"><input type="radio" name="mode" value="debit" required>Debit</label>
+              <label style="margin-right:80px;"><input type="radio" name="mode" value="credit">Credit</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="select_bank">Bank Name</label>
+            <select id="select_bank" name="select_bank" required>
+              <option value="">------------Select Bank------------ </option>
+              {% for i in bank_select %}
+              <option value="{{ i.Sub_name }}">{{ i.Sub_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+       
+        <div class="inline-form-group">    
+          <div class="form-group" style="width:25%;">
+            <label for="account_code">Account Code</label>
+            <input type="text" id="account_code" name="account_code" autocomplete="off" required>
+          </div>
+       <label style="width:5%;"></label>
+          <div class="form-group" style="flex: 1;">
+            <label for="account_name">Account Name</label>
+            <input type="text" id="account_name" name="account_name" autocomplete="off" required>
+          </div>
+        </div>        
+ 
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label for="sub_ledger">SubLedger</label>
+              <select id="sub_ledger" name="sub_ledger">
+                <option value=""></option>
+              </select>
+            </div>
+          </div>
+         
+          <div class="col">
+            <div class="form-group">
+              <label for="amount">Amount</label>
+              <input type="number" id="amount" name="amount" required>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label for="narration">Narration</label>
+              <textarea id="narration" name="narration" rows="3" cols="30" required></textarea>
+            </div>
+          </div>
+        </div>
+ 
+        <div style="display: flex; justify-content: center; gap: 20px;">
+          <button type="submit" id="save" class="btn" style="background: #5c4444;">Save</button>
+          <button type="reset" class="btn" style="background: #5c4444;">Reset</button>
+        </div>
+      </form>
+        <h2 style="text-align: left; font-size: 20px; margin-bottom: 15px;">Transaction History</h2>
+        <table>
+          <thead>
+            <tr>
+             
+              <th style="text-align: center;">Date</th>
+              <th style="text-align: center;">Ac Code</th>
+              <th style="text-align: center;">Ac Name</th>
+              <th style="text-align: center;">Sub Code</th>
+              <th style="text-align: center;">Sub Name</th>
+              <th style="text-align: center;">Bank Name</th>
+              <th style="text-align: center;">Debit</th>
+              <th style="text-align: center;">Credit</th>
+              <th style="text-align: center;">Narration</th>
+              <th style="text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in entries %}
+              <tr>
+                  <td>{{ entry.Ac_date }}</td>
+                  <td>{{ entry.Fk_accode }}</td>
+                  <td>{{ entry.get_account_name }}</td>  
+                  <td>{{ entry.Sub_code }}</td>
+                  <td>{{ entry.get_sub_name }}</td>  
+                  <td>{{ entry.Bank }}</td>
+                  <td>{% if entry.Mode == 'debit' %}{{ entry.Trans_amount }}{% endif %}</td>
+                  <td>{% if entry.Mode == 'credit' %}{{ entry.Trans_amount }}{% endif %}</td>
+                  <td>{{ entry.Narration }}</td>
+                  <td>
+                    <div class="buttons-container">
+                      <form method="post" action="{% url 'delete_bank_entry' entry.id user.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this entry?')">Delete</button>
+                      </form>                                          
+                    </div>
+                  </td>
+              </tr>
+              <script type="application/json" id="entry_{{ entry.id }}">
+                {
+                  "date": "{{ entry.date|escapejs }}",
+                  "mode": "{{ entry.mode|escapejs }}",
+                  "account_code": "{{ entry.account_code|escapejs }}",
+                  "account_name": "{{ entry.account_name|escapejs }}",
+                  "amount": "{{ entry.amount|escapejs }}",
+                  "sub_ledger": "{{ entry.sub_code }} - {{ entry.sub_name }}",
+                  "narration": "{{ entry.narration|escapejs }}",
+                  "bankname": "{{ entry.Bank|escapejs }}"
+                }
+              </script>
+             
+            {% empty %}
+              <tr><td colspan="10">No entries yet.</td></tr>
+            {% endfor %}
+          </tbody>
+         
+        </table>
+      </div>
+      </form>
+    </div>
+  </div>
+ 
+  <script>
+      function updateDateTime() {
+  const now = new Date();
+  const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+  const timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true };
+
+  document.querySelector('.header span:nth-child(3)').textContent = 'Date: ' + now.toLocaleDateString('en-GB', dateOptions);
+  document.querySelector('.header span:nth-child(4)').textContent = 'Time: ' + now.toLocaleTimeString('en-GB', timeOptions);
+      }
+// on mouse hover
+window.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.dropdown').forEach(item => {
+    const menu = item.querySelector('.dropdown-menu');
+    item.addEventListener('mouseenter', () => {
+      menu.style.display = 'block';
+    });
+    item.addEventListener('mouseleave', () => {
+      menu.style.display = 'none';
+    });
+    // Make sure it's hidden initially
+    menu.style.display = 'none';
+  });
+});    
+updateDateTime();
+setInterval(updateDateTime, 1000);
+
+function fetchAndPopulateSubLedger(accountCode) {
+    fetch(`/search_sub_account/?query=${accountCode}`)
+        .then(response => response.json())
+        .then(data => {
+            const subLedgerSelect = document.getElementById('sub_ledger');
+            subLedgerSelect.innerHTML = '';
+
+            if (!Array.isArray(data) || data.length === 0) {
+                subLedgerSelect.innerHTML = '<option value="">No subledgers available</option>';
+                return;
+            }
+
+            data.forEach(subledger => {
+  const option = document.createElement('option');
+  option.value = subledger.Sub_code;
+  option.textContent = `${subledger.Sub_code} - ${subledger.Sub_name}`;
+  subLedgerSelect.appendChild(option);
+});
+
+        })
+        .catch(error => {
+            console.error('Error fetching subledgers:', error);
+            const subLedgerSelect = document.getElementById('sub_ledger');
+            subLedgerSelect.innerHTML = '<option value="">Error fetching data</option>';
+        });
+}
+
+      const dropdowns = document.querySelectorAll('.dropdown');
+      dropdowns.forEach(drop => {
+        const link = drop.querySelector('a');
+        const menu = drop.querySelector('.dropdown-menu');
+        menu.style.display = 'none';
+   
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          document.querySelectorAll('.dropdown-menu').forEach(d => {
+            if (d !== menu) d.style.display = 'none';
+          });
+          menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('date').value = today;
+        });
+      });
+     
+    document.addEventListener('DOMContentLoaded', function () {
+    const bankSelect = document.getElementById('select_bank');
+    const customBankGroup = document.getElementById('custom_bankname_group');
+
+    bankSelect.addEventListener('change', function () {
+      if (this.value === 'others') {
+        customBankGroup.style.display = 'block';
+      } else {
+        customBankGroup.style.display = 'none';
+      }
+    });
+  });
+  document.addEventListener('DOMContentLoaded', function () {
+    const nameInput = document.getElementById('account_name');
+    const suggestionBox = document.createElement('ul');
+    let currentFocus = -1;
+
+    Object.assign(suggestionBox.style, {
+        position: 'absolute',
+        border: '1px solid #ccc',
+        backgroundColor: 'white',
+        color : '#0f0f0f',
+        listStyleType: 'none',
+        padding: '0',
+        marginTop: '52px',
+        marginLeft: '188px',
+        width: '300px',
+        maxHeight: '150px',
+        overflowY: 'auto',
+        zIndex: '1000'
+    });
+
+    suggestionBox.hidden = true;
+    nameInput.parentNode.appendChild(suggestionBox);
+
+    nameInput.addEventListener('input', function () {
+        const query = nameInput.value;
+        suggestionBox.innerHTML = '';
+        currentFocus = -1;
+
+        if (!query) {
+            suggestionBox.hidden = true;
+            return;
+        }
+
+        fetch(`/search_account_names_daybook/?query=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length === 0) {
+                    suggestionBox.hidden = true;
+                    return;
+                }
+
+                data.forEach(account => {
+                    const item = document.createElement('li');
+                    item.textContent = `${account.Pkac_code} - ${account.Ac_name}`;
+                    Object.assign(item.style, {
+                        padding: '5px',
+                        cursor: 'pointer'
+                    });
+
+                    item.addEventListener('click', () => {
+                        selectItem(item.textContent);
+                    });
+
+                    item.addEventListener('mouseover', () => {
+                        currentFocus = Array.from(suggestionBox.children).indexOf(item);
+                        highlightActiveItem(suggestionBox.children);
+                    });
+
+                    suggestionBox.appendChild(item);
+                });
+
+                suggestionBox.hidden = false;
+            });
+    });
+
+    nameInput.addEventListener('keydown', function (e) {
+        const items = suggestionBox.querySelectorAll('li');
+        if (suggestionBox.hidden || items.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            currentFocus = (currentFocus + 1) % items.length;
+            highlightActiveItem(items);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            currentFocus = (currentFocus - 1 + items.length) % items.length;
+            highlightActiveItem(items);
+        } else if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (currentFocus > -1) {
+                items[currentFocus].click();
+            }
+        }
+    });
+
+    function highlightActiveItem(items) {
+        Array.from(items).forEach((item, index) => {
+            item.style.backgroundColor = index === currentFocus ? '#c7b7b7' : '#fff';
+        });
+    }
+
+    function selectItem(text) {
+        const [code, name] = text.split(' - ');
+        document.getElementById('account_code').value = code.trim();
+        nameInput.value = name.trim();
+        fetchAndPopulateSubLedger(code.trim());
+        const sub_Input = document.getElementById('sub_ledger');
+        sub_Input.value = '-';
+        sub_Input.focus();
+        suggestionBox.hidden = true;
+    }
+
+    document.addEventListener('click', function (event) {
+        if (!nameInput.contains(event.target) && !suggestionBox.contains(event.target)) {
+            suggestionBox.hidden = true;
+        }
+    });
+});
+
+   
+    document.addEventListener('DOMContentLoaded', function () {
+    const nameInput = document.getElementById('account_code');
+    const suggestionBox = document.createElement('ul');
+    let currentFocus = -1;
+
+    Object.assign(suggestionBox.style, {
+        position: 'absolute',
+        border: '1px solid #ccc',
+        backgroundColor: 'white',
+        color : '#0f0f0f',
+        listStyleType: 'none',
+        padding: '0',
+        marginTop: '52px',
+        marginLeft: '188px',
+        width: '300px',
+        maxHeight: '150px',
+        overflowY: 'auto',
+        zIndex: '1000'
+    });
+
+    suggestionBox.hidden = true;
+    nameInput.parentNode.appendChild(suggestionBox);
+
+    nameInput.addEventListener('input', function () {
+        const query = nameInput.value;
+        suggestionBox.innerHTML = '';
+        currentFocus = -1;
+
+        if (!query) {
+            suggestionBox.hidden = true;
+            return;
+        }
+
+        fetch(`/search_account_code_daybook/?query=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length === 0) {
+                    suggestionBox.hidden = true;
+                    return;
+                }
+
+                data.forEach(account => {
+                    const item = document.createElement('li');
+                    item.textContent = `${account.Pkac_code} - ${account.Ac_name}`;
+                    Object.assign(item.style, {
+                        padding: '5px',
+                        cursor: 'pointer'
+                    });
+
+                    item.addEventListener('click', () => {
+                        selectItem(item.textContent);
+                    });
+
+                    item.addEventListener('mouseover', () => {
+                        currentFocus = Array.from(suggestionBox.children).indexOf(item);
+                        highlightActiveItem(suggestionBox.children);
+                    });
+
+                    suggestionBox.appendChild(item);
+                });
+
+                suggestionBox.hidden = false;
+            });
+    });
+
+    nameInput.addEventListener('keydown', function (e) {
+        const items = suggestionBox.querySelectorAll('li');
+        if (suggestionBox.hidden || items.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            currentFocus = (currentFocus + 1) % items.length;
+            highlightActiveItem(items);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            currentFocus = (currentFocus - 1 + items.length) % items.length;
+            highlightActiveItem(items);
+        } else if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (currentFocus > -1) {
+                items[currentFocus].click();
+            }
+        }
+    });
+
+    function highlightActiveItem(items) {
+        Array.from(items).forEach((item, index) => {
+            item.style.backgroundColor = index === currentFocus ? '#c7b7b7' : '#fff';
+        });
+    }
+
+    function selectItem(text) {
+        const [code, name] = text.split(' - ');
+        nameInput.value = code.trim();
+        document.getElementById('account_name').value = name.trim();
+        fetchAndPopulateSubLedger(code.trim());
+        document.getElementById('sub_ledger').value = '-';
+        document.getElementById('sub_ledger').focus();
+        suggestionBox.hidden = true;
+    }
+
+
+    document.addEventListener('click', function (event) {
+        if (!nameInput.contains(event.target) && !suggestionBox.contains(event.target)) {
+            suggestionBox.hidden = true;
+        }
+    });
+});
+document.addEventListener('DOMContentLoaded', function () {
+    const subLedgerSelect = document.getElementById('sub_ledger');
+    const accountCodeInput = document.getElementById('account_code');
+
+    accountCodeInput.addEventListener('blur', function () {
+        const query1 = accountCodeInput.value;
+        if (!query1) return;
+
+        subLedgerSelect.innerHTML = '<option value="">-- Select Sub Ledger --</option>';
+
+        fetch(`/search_sub_account/?query1=${query1}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length === 0) {
+                    subLedgerSelect.innerHTML = '<option value="-">-</option>';
+                    return;
+                }
+                data.forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub.Sub_code;
+                    option.textContent = sub.Sub_name;
+                    subLedgerSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching sub ledger:', error);
+            });
+    });
+});
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.select-btn').forEach(button => {
+    button.addEventListener('click', function () {
+      const entryId = this.getAttribute('data-entry-id');
+      const entryDataEl = document.getElementById('entry_' + entryId);
+      if (!entryDataEl) return;
+
+      const entryData = JSON.parse(entryDataEl.textContent);
+
+      document.getElementById('entry_id').value = entryId;
+      document.getElementById('date').value = entryData.date;
+      const modeInput = document.querySelector(`input[name="mode"][value="${entryData.mode}"]`);
+      if (modeInput) modeInput.checked = true;
+
+      document.getElementById('account_code').value = entryData.account_code;
+      document.getElementById('account_name').value = entryData.account_name;
+      document.getElementById('amount').value = entryData.amount;
+      document.getElementById('narration').value = entryData.narration;
+      document.getElementById('sub_ledger').value = entryData.sub_ledger;
+
+      document.getElementById('selected-entry-label').innerHTML = `
+        Selected Entry: <strong>${entryData.date}</strong> |
+        <strong>${entryData.mode.toUpperCase()}</strong> |
+        <strong>${entryData.account_code} - ${entryData.account_name}</strong> |
+        ₹${entryData.amount} |
+        <em>${entryData.narration}</em> |
+        Sub Ledger: ${entryData.sub_ledger}
+      `;
+    });
+  });
+});
+
+
+    subLedgerSelect.addEventListener('change', function () {
+        const selectedValue = subLedgerSelect.value;
+        console.log('Selected Sub Ledger:', selectedValue);
+    });
+
+document.getElementById('date').addEventListener('keydown', function(event) {
+      const mode_Input = document.querySelector('input[name="mode"]');
+      if (event.key === 'Enter') {
+          event.preventDefault();
+          mode_Input.focus();
+        }
+      });
+document.getElementById('narration').addEventListener('keydown', function(event) {
+      const sub_Input = document.querySelector('input[name="sub_ledger"]');
+      if (event.key === 'Enter') {
+          event.preventDefault();
+          sub_Input.focus();
+        }
+      });  
+document.getElementById('select_bank').addEventListener('keydown', function(event) {
+      const code_Input = document.querySelector('input[name="account_code"]');
+      if (event.key === 'Enter') {
+          event.preventDefault();
+          code_Input.focus();
+        }
+      });
+      document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.select-btn').forEach(button => {
+      button.addEventListener('click', function () {
+      const entryId = this.getAttribute('data-entry-id');
+      const entryData = JSON.parse(document.getElementById('entry_' + entryId).textContent);
+      document.getElementById('entry_id').value = entryId;
+      document.getElementById('date').value = entryData.date;
+      document.querySelector(`input[name="mode"][value="${entryData.mode}"]`).checked = true;
+      document.getElementById('account_code').value = entryData.account_code;
+      document.getElementById('account_name').value = entryData.account_name;
+      document.getElementById('amount').value = entryData.amount;
+      document.getElementById('narration').value = entryData.narration;
+      document.getElementById('sub_ledger').value = entryData.sub_ledger;
+      document.getElementById('select_bank').value = entryData.bankname.toLowerCase();
+      document.getElementById('selected-entry-label').innerHTML = `
+        Selected Entry: <strong>${entryData.date}</strong> |
+        <strong>${entryData.mode.toUpperCase()}</strong> |
+        <strong>${entryData.account_code} - ${entryData.account_name}</strong> |
+        ₹${entryData.amount} |
+        <em>${entryData.narration}</em> |
+        Sub Ledger: ${entryData.sub_ledger}
+      `;
+    });
+  });
+});
+document.getElementById('save').addEventListener('keydown', function(event) {
+  const add_Input = document.getElementById('save');
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    add_Input.click();
+}
+});
+document.getElementById('narration').addEventListener('keydown', function(event) {
+  const add_Input = document.getElementById('save');
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    add_Input.click();
+}
+});
+window.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.dropdown').forEach(item => {
+    const menu = item.querySelector('.dropdown-menu');
+    item.addEventListener('mouseenter', () => {
+      menu.style.display = 'block';
+    });
+    item.addEventListener('mouseleave', () => {
+      menu.style.display = 'none';
+    });
+    menu.style.display = 'none';
+  });
+});
+</script>
+
+</body>
+</html>

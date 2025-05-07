@@ -1,0 +1,356 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <hr />
+    <div id="tabs">
+      <div class="header">
+        <span>Branch: {{ user.B_id.Branch_name }}</span>
+        <span>User: {{ user.Username }}</span>
+        <span>Date: </span>
+        <span>Time: </span>
+      </div>
+      <ul>
+        <li><a href="{% url 'index' user.id %}"><span>Home</span></a></li>
+        <li class="dropdown">
+          <a href="#"><span>Admin</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'user_reg' user.id %}"><pre> User Registration </pre></a></li>
+            <li><a href="{% url 'change_password' user.id %}"><pre>  Change Password  </pre></a></li>
+            <li><a href="{% url 'staff_registration' user.id %}"><pre>Staff Registration </pre></a></li>
+          </ul>
+        </li>
+        <li><a href="#"><span>Master</span></a></li>
+        <li><a href="#"><span>Deposit</span></a></li>
+        <li><a href="#"><span>Gold Loan</span></a></li>
+        <li class="dropdown">
+          <a href="#"><span>Accounts</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'account_schedule_form' user.id %}"><pre>Account Registration   </pre></a></li>
+            <li><a href="{% url 'sub_ledger' user.id %}"><pre>SubLedger Registration </pre></a></li>
+            <li><a href="{% url 'cash_book_entry' user.id %}"><pre>    Cashbook Entry     </pre></a></li>
+            <li><a href="{% url 'bankbook' user.id %}"><pre>    Bankbook Entry     </pre></a></li>
+            <li><a href="{% url 'journal' user.id %}"><pre>    Journal Entry      </pre></a></li>
+          </ul>
+        </li>
+        <li><a href="#"><span>Loans</span></a></li>
+        <li><a href="{% url 'logout' %}"><span>Logout</span></a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="form-container" style="width:555px;">
+    <h2>USER REGISTRATION</h2>
+    {% if messages %}
+      <ul style="width: 60%; margin: auto; padding: 10px; list-style: none;">
+        {% for message in messages %}
+  {% if message.tags == 'success' %}
+    <li><script>alert("{{ message }}");</script></li>
+  {% endif %}
+{% endfor %}
+      </ul>
+    {% endif %}
+    <form method="POST" action="">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="name">Name Help</label>
+        <input type="text" id="name" name="name" autocomplete="off" placeholder="Search Account Name...">
+    </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="Username" name="Username" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="Password" name="Password" required>
+      </div>
+      <div class="form-group">
+        <label>Branch Name</label>
+        {% if user.B_id.Branch_name == "Head Office" %}
+          <select id="Branch_name" name="Branch_name" required onchange="fillBranchCode()">
+            <option value="">----------------------Select Branch-------------------------</option>
+            {% for branch in branch_list %}
+            <option value="{{ branch.Branch_name }}" data-code="{{ branch.Branch_code }}">
+    {{ branch.Branch_name }}
+  </option>
+{% endfor %}
+          </select>
+        {% else %}
+          <input type="text" id="Branch_name" name="Branch_name" value="{{ user.B_id.Branch_name }}" readonly>
+        {% endif %}
+      </div>
+      <div class="form-group">
+        <label>Branch Code</label>
+        {% if user.B_id.Branch_name == "Head Office" %}
+  <input type="text" id="Branch_code" name="Branch_code" readonly>
+{% else %}
+  <input type="text" id="Branch_code" name="Branch_code" value="{% for branch in branch_list %}{% if branch.Branch_name == user.B_id.Branch_name %}{{ branch.Branch_code }}{% endif %}{% endfor %}" readonly>
+{% endif %}
+      </div>          
+      <div class="form-group">
+        <label>User Level</label>
+        <div class="radio-group">
+          <label class="radio-inline">
+            <input type="radio" id="User_level" name="User_level" value="Entry" required> Entry
+          </label>
+          <label class="radio-inline" style="margin-right:60px;">
+            <input type="radio" id="User_level" name="User_level" value="Approver"> Approver
+          </label>
+        </div>
+      </div>
+        <div class="form-group">
+        <label >Status</label>
+        <div class="radio-group">
+          <label class="radio-inline">
+            <input type="radio" id="Status" name="Status" value="Opened" required> Opened
+          </label>
+          <label class="radio-inline" style="margin-right:60px;">
+            <input type="radio" id="Status" name="Status" value="Closed"> Closed
+          </label>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: center; gap: 20px;">
+        <button type="submit" id="saveUpdateButton" class="btn" style="background: #5c4444;">Save</button>
+        <button type="reset" class="btn" style="background: #5c4444;" onclick="resetdetails()">Reset</button>
+        <button type="button" class="btn" style="background: #5c4444;" onclick="toggleView()">View</button>
+      </div>
+    </form>
+    <div id="data-table-container" class="table-container">
+      <table>
+        <thead><br><br>
+          <tr>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Branch Code</th>
+            <th>Branch Name</th>
+            <th>User Level</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for reg in user_data %}
+          <tr>
+            <td>{{ reg.Username }}</td>
+            <td>{% for i in reg.Password %}*{% endfor %}</td>
+            <td>{{ reg.B_id.Branch_code }}</td>
+            <td>{{ reg.B_id.Branch_name }}</td>
+            <td>{{ reg.User_level }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5">No records found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const dropdowns = document.querySelectorAll('.dropdown');
+      dropdowns.forEach(drop => {
+        const link = drop.querySelector('a');
+        const menu = drop.querySelector('.dropdown-menu');
+        menu.style.display = 'none';
+    
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          document.querySelectorAll('.dropdown-menu').forEach(d => {
+            if (d !== menu) d.style.display = 'none';
+          });
+          menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        });
+    
+        drop.addEventListener('mouseenter', () => menu.style.display = 'block');
+        drop.addEventListener('mouseleave', () => menu.style.display = 'none');
+      });
+    
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.dropdown')) {
+          document.querySelectorAll('.dropdown-menu').forEach(menu => menu.style.display = 'none');
+        }
+      });
+    
+      function updateDateTime() {
+        const now = new Date();
+        const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+        const timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true };
+    
+        const spans = document.querySelectorAll('.header span');
+        if (spans.length >= 4) {
+          spans[2].textContent = 'Date: ' + now.toLocaleDateString('en-GB', dateOptions);
+          spans[3].textContent = 'Time: ' + now.toLocaleTimeString('en-GB', timeOptions);
+        }
+      }
+      updateDateTime();
+      setInterval(updateDateTime, 1000);
+    
+      const branchNameSelect = document.getElementById('Branch_name');
+      const branchCodeInput = document.getElementById('Branch_code');
+    
+      function fillBranchCode() {
+        const selectedOption = branchNameSelect.options[branchNameSelect.selectedIndex];
+        const branchCode = selectedOption.getAttribute('data-code');
+        if (branchCode) {
+          branchCodeInput.value = branchCode;
+        }
+      }
+    
+      branchNameSelect.addEventListener('change', fillBranchCode);
+      branchNameSelect.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          branchCodeInput.focus();
+        }
+      });
+    
+      const nameInput = document.getElementById('name');
+      const suggestionBox = document.createElement('ul');
+      let currentFocus = -1;
+    
+      Object.assign(suggestionBox.style, {
+        position: 'absolute',
+        border: '1px solid #ccc',
+        backgroundColor: 'white',
+        color: '#0f0f0f',
+        listStyleType: 'none',
+        padding: '0',
+        marginTop: '52px',
+        marginLeft: '142px',
+        width: '300px',
+        maxHeight: '150px',
+        overflowY: 'auto',
+        zIndex: '1000'
+      });
+    
+      suggestionBox.hidden = true;
+      nameInput.parentNode.appendChild(suggestionBox);
+    
+      function highlightItem(index) {
+        const items = suggestionBox.querySelectorAll('li');
+        items.forEach((item, i) => {
+          item.style.backgroundColor = i === index ? '#c7b7b7' : '#fff';
+        });
+      }
+    
+      function fillForm(account) {
+        nameInput.value = account.Username;
+        const saveUpdateButton = document.getElementById('saveUpdateButton');
+        saveUpdateButton.textContent = 'Update';
+        saveUpdateButton.value = 'update';
+        document.getElementById('Username').value = account.Username;
+        document.getElementById('Username').readOnly = true;
+        document.getElementById('Password').value = account.Password;
+        document.getElementById('Password').readOnly = true;
+        document.getElementById('Branch_name').value = account.Branch_name;
+    
+        const userLevel = (account.User_level || '').trim().toLowerCase();
+        document.querySelectorAll('input[name="User_level"]').forEach(el => {
+          el.checked = el.value.toLowerCase() === userLevel;
+        });
+    
+        const status = (account.Status || '').trim().toLowerCase();
+        document.querySelectorAll('input[name="Status"]').forEach(el => {
+          el.checked = el.value.toLowerCase() === status;
+        });
+    
+        fillBranchCode();
+        suggestionBox.hidden = true;
+      }
+    
+      nameInput.addEventListener('input', function () {
+        const query = nameInput.value;
+        if (query.length === 0) {
+          suggestionBox.hidden = true;
+          return;
+        }
+    
+        fetch(`/search_user_names/?query=${query}&branch_name={{ user.B_id.Branch_name|urlencode }}`)
+          .then(response => response.json())
+          .then(data => {
+            suggestionBox.innerHTML = '';
+            currentFocus = -1;
+    
+            data.forEach(account => {
+              const item = document.createElement('li');
+              item.style.padding = '5px';
+              item.style.cursor = 'pointer';
+              item.textContent = account.Username;
+              item.addEventListener('click', () => fillForm(account));
+              suggestionBox.appendChild(item);
+            });
+    
+            suggestionBox.hidden = data.length === 0;
+          });
+      });
+    
+      nameInput.addEventListener('keydown', function (e) {
+        const items = suggestionBox.querySelectorAll('li');
+        if (items.length === 0) return;
+    
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          currentFocus = (currentFocus + 1) % items.length;
+          highlightItem(currentFocus);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          currentFocus = (currentFocus - 1 + items.length) % items.length;
+          highlightItem(currentFocus);
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (currentFocus > -1) items[currentFocus].click();
+        }
+      });
+    
+      document.addEventListener('click', function (event) {
+        if (!(event.target === nameInput || suggestionBox.contains(event.target))) {
+          suggestionBox.hidden = true;
+        }
+      });
+    
+      function toggleView() {
+        const tableContainer = document.getElementById("data-table-container");
+        tableContainer.style.display = tableContainer.style.display === "none" ? "block" : "none";
+        if (tableContainer.style.display === "block") fetchUsers();
+      }
+    
+      function fetchUsers() {
+        const userId = "{{ user.id }}";
+        fetch(`/get_users_by_branch/?user_id=${userId}`)
+          .then(response => response.json())
+          .then(data => {
+            const tbody = document.querySelector('#data-table-container tbody');
+            tbody.innerHTML = '';
+    
+            if (data.length === 0) {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `<td colspan="5">No records found.</td>`;
+              tbody.appendChild(tr);
+            } else {
+              data.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                  <td>${user.Username}</td>
+                  <td>${'*'.repeat(user.Password.length)}</td>
+                  <td>${user.Branch_code}</td>
+                  <td>${user.Branch_name}</td>
+                  <td>${user.User_level}</td>
+                `;
+                tbody.appendChild(tr);
+              });
+            }
+          });
+      }
+      window.toggleView = toggleView;
+    });
+  function resetdetails() {
+    const saveUpdateButton = document.getElementById('saveUpdateButton');
+    saveUpdateButton.textContent = 'Save';
+    saveUpdateButton.value = 'submit';
+  }
+  </script>
+    
+</body>
+</html>

@@ -1,0 +1,47 @@
+# Python bytecode
+*.pyc
+*.pyo
+__pycache__/
+
+# Django database (SQLite)
+db.sqlite3
+
+# Virtual environment
+venv/
+env/
+
+# Environment variables
+.env
+
+# Logs and translations
+*.log
+*.pot
+*.mo
+
+# IDE/editor settings
+.vscode/
+.idea/
+.spyderproject
+.ropeproject/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Static/media (optional)
+staticfiles/
+media/
+
+# Testing and coverage
+.coverage
+.coverage.*
+.tox/
+.nox/
+nosetests.xml
+coverage.xml
+
+# Build/dist
+*.egg
+*.egg-info/
+dist/
+build/

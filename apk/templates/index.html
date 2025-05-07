@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <hr />
+    <div id="tabs">
+      <div class="header">
+        <span>Branch: {{ user.B_id.Branch_name }}</span>
+        <span>User: {{ user.Username }}</span>
+        <span>Date: </span>
+        <span>Time: </span>
+      </div>
+      <ul>
+        <li><a href="{% url 'index' user.id %}"><span>Home</span></a></li>
+        <li class="dropdown">
+          <a href="#"><span>Admin</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'user_reg' user.id %}"><pre> User Registration </pre></a></li>
+            <li><a href="{% url 'change_password' user.id %}"><pre>  Change Password  </pre></a></li>
+            <li><a href="{% url 'staff_registration' user.id %}"><pre>Staff Registration </pre></a></li>
+          </ul>
+        </li>
+        <li><a href="#"><span>Master</span></a></li>
+        <li><a href="#"><span>Deposit</span></a></li>
+        <li><a href="#"><span>Gold Loan</span></a></li>
+        <li class="dropdown">
+          <a href="#"><span>Accounts</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'account_schedule_form' user.id %}"><pre>Account Registration   </pre></a></li>
+            <li><a href="{% url 'sub_ledger' user.id %}"><pre>SubLedger Registration </pre></a></li>
+            <li><a href="{% url 'cash_book_entry' user.id %}"><pre>    Cashbook Entry     </pre></a></li>
+            <li><a href="{% url 'bankbook' user.id %}"><pre>    Bankbook Entry     </pre></a></li>
+            <li><a href="{% url 'journal' user.id %}"><pre>    Journal Entry      </pre></a></li>
+          </ul>
+        </li>
+        <li><a href="#"><span>Loans</span></a></li>
+        <li><a href="{% url 'logout' %}"><span>Logout</span></a></li>
+      </ul>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.dropdown').forEach(drop => {
+        const link = drop.querySelector('a');
+        const menu = drop.querySelector('.dropdown-menu');
+        menu.style.display = 'none';
+    
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          document.querySelectorAll('.dropdown-menu').forEach(d => {
+            if (d !== menu) d.style.display = 'none';
+          });
+          menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        });
+    
+        drop.addEventListener('mouseenter', () => menu.style.display = 'block');
+        drop.addEventListener('mouseleave', () => menu.style.display = 'none');
+      });
+    
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.dropdown')) {
+          document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            menu.style.display = 'none';
+          });
+        }
+      });
+    
+      function updateDateTime() {
+        const now = new Date();
+        const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+        const timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true };
+    
+        const headerSpans = document.querySelectorAll('.header span');
+        if (headerSpans.length >= 4) {
+          headerSpans[2].textContent = 'Date: ' + now.toLocaleDateString('en-GB', dateOptions);
+          headerSpans[3].textContent = 'Time: ' + now.toLocaleTimeString('en-GB', timeOptions);
+        }
+      }
+    
+      updateDateTime();
+      setInterval(updateDateTime, 1000);
+    });
+  </script>
+</body>
+</html>

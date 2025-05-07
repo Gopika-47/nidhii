@@ -1,0 +1,588 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <hr />
+    <div id="tabs">
+      <div class="header">
+        <span>Branch: {{ user.B_id.Branch_name }}</span>
+        <span>User: {{ user.Username }}</span>
+        <span>Date: </span>
+        <span>Time: </span>
+      </div>
+      <ul>
+        <li><a href="{% url 'index' user.id %}"><span>Home</span></a></li>
+        <li class="dropdown">
+          <a href="#"><span>Admin</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'user_reg' user.id %}"><pre> User Registration </pre></a></li>
+            <li><a href="{% url 'change_password' user.id %}"><pre>  Change Password  </pre></a></li>
+            <li><a href="{% url 'staff_registration' user.id %}"><pre>Staff Registration </pre></a></li>
+          </ul>
+        </li>
+        <li><a href="#"><span>Master</span></a></li>
+        <li><a href="#"><span>Deposit</span></a></li>
+        <li><a href="#"><span>Gold Loan</span></a></li>
+        <li class="dropdown">
+          <a href="#"><span>Accounts</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'account_schedule_form' user.id %}"><pre>Account Registration   </pre></a></li>
+            <li><a href="{% url 'sub_ledger' user.id %}"><pre>SubLedger Registration </pre></a></li>
+            <li><a href="{% url 'cash_book_entry' user.id %}"><pre>    Cashbook Entry     </pre></a></li>
+            <li><a href="{% url 'bankbook' user.id %}"><pre>    Bankbook Entry     </pre></a></li>
+            <li><a href="{% url 'journal' user.id %}"><pre>    Journal Entry      </pre></a></li>
+          </ul>
+        </li>
+        <li><a href="#"><span>Loans</span></a></li>
+        <li><a href="{% url 'logout' %}"><span>Logout</span></a></li>
+      </ul>
+    </div>
+  </div>
+<div class="form-container" style="max-width:900px;">
+  {% if messages %}
+  <ul style="width: 60%; margin: auto; padding: 10px; list-style: none;">
+    {% for message in messages %}
+      <li>
+        <script>
+          alert("{{ message }}");
+        </script>
+      </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <form id="accountForm" method="post">
+      {% csrf_token %}
+      <div class="form-section">
+          <h2>Main Head & Schedule Details</h2>
+          <div class="row">
+              <div class="col">
+                  <div class="form-group">
+                      <label for="account_code">Main Head Code</label>
+                      <input type="text" id="account_code" name="account_code" autocomplete="off" required>
+                  </div>
+              </div>
+              <div class="col">
+                  <div class="form-group">
+                      <label for="account_name">Main Head Name</label>
+                      <input type="text" id="account_name" name="account_name" autocomplete="off">
+                  </div>
+              </div>
+          </div>
+          <div class="row">
+              <div class="col">
+                  <div class="form-group">
+                      <label for="accountNature">Account Nature</label>
+                      <select id="accountNature" name="accountNature" required>
+                          <option value="">------------------Select--------------------</option>
+                          <option value="asset">Asset</option>
+                          <option value="liability">Liability</option>
+                          <option value="income">Income</option>
+                          <option value="expense">Expense</option>
+                      </select>
+                  </div>
+              </div>
+              <div class="col">
+                  <div class="form-group">
+                      <label>Account Type</label>
+                      <div class="radio-group">
+                          <label style="margin-right:30px;"><input type="radio" name="accountType" value="balanceSheet" required>Balance Sheet</label>
+                          <label style="margin-right:30px;"><input type="radio" name="accountType" value="profitLoss" required>Profit/Loss</label>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="row">
+              <div class="col">
+                  <div class="form-group">
+                      <label for="scheduleCode">Schedule Code</label>
+                      <select id="scheduleCode" name="scheduleCode" required onchange="updateScheduleName()">
+                          <option value="">-------------Select Schedule-----------</option>
+                          <option value="10 - ASSETS">10 - ASSETS</option>
+                          <option value="15 - CURRENT ASSETS">15 - CURRENT ASSETS</option>
+                          <option value="20 - LIABILITY">20 - LIABILITY</option>
+                          <option value="25 - CURRENT LIABILITY">25 - CURRENT LIABILITY</option>
+                          <option value="30 - INCOME">30 - INCOME</option>
+                          <option value="40 - EXPENSE">40 - EXPENSE</option>
+                      </select>
+                  </div>
+              </div>
+              <div class="col">
+                  <div class="form-group">
+                      <label for="scheduleName">Schedule Name</label>
+                      <input type="text" id="scheduleName" name="scheduleName" readonly required>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <h3>Sub Account Details</h3><br>
+      <div class="row">
+          <div class="col">
+              <div class="form-group">
+                  <label for="name">Name Help</label>
+                  <input type="text" id="name" name="name" autocomplete="off" placeholder="Search SubLedger Name...">
+                  <ul id="nameSuggestions" style="list-style-type: none;"></ul>
+              </div>
+          </div>
+          <div class="col">
+              <label></label>
+          </div>
+      </div>
+      <hr/>
+      <div class="row">
+          <div class="col">
+              <div class="form-group">
+                  <label for="Sub_code">Account Code</label>
+                  <input type="text" id="Sub_code" name="Sub_code" required readonly>
+              </div>
+          </div>
+          <div class="col">
+              <div class="form-group">
+                  <label for="Sub_name">Account Name</label>
+                  <input type="text" id="Sub_name" name="Sub_name" required>
+              </div>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col">
+              <div class="form-group">
+                  <label for="branch">Branch</label>
+                  <select id="branch" name="branch" required>
+                      <option value="">-------------Select Branch-------------</option>
+                      <option value="All">All</option>
+                      <option value="Head Office">Head Office</option>
+                  </select>
+              </div>
+          </div>
+          <div class="col">
+              <label></label>
+          </div>
+      </div>
+      <div style="display: flex; justify-content: center; gap: 20px;">
+          <button type="submit" name="submit" class="save-btn">Save</button>
+          <button type="reset" class="reset-btn" onclick="resetdetails()">Reset</button>
+      </div>
+
+<script>
+
+  function updateDateTime() {
+  const now = new Date();
+  const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+  const timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true };
+
+  document.querySelector('.header span:nth-child(3)').textContent = 'Date: ' + now.toLocaleDateString('en-GB', dateOptions);
+  document.querySelector('.header span:nth-child(4)').textContent = 'Time: ' + now.toLocaleTimeString('en-GB', timeOptions);
+}
+updateDateTime();
+setInterval(updateDateTime, 1000);
+    document.addEventListener('DOMContentLoaded', function () {
+      const dropdowns = document.querySelectorAll('.dropdown');
+      dropdowns.forEach(drop => {
+        const link = drop.querySelector('a');
+        const menu = drop.querySelector('.dropdown-menu');
+        menu.style.display = 'none';
+
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          document.querySelectorAll('.dropdown-menu').forEach(d => {
+            if (d !== menu) d.style.display = 'none';
+          });
+          menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+      });
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.dropdown')) {
+          document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            menu.style.display = 'none';
+          });
+        }
+      });
+    });
+
+    function updateScheduleName() {
+      const scheduleDropdown = document.getElementById('scheduleCode');
+      const selectedOption = scheduleDropdown.value;
+      if (selectedOption) {
+          const parts = selectedOption.split(' - ');
+          document.getElementById('scheduleName').value = parts[1];
+      } else {
+          document.getElementById('scheduleName').value = '';
+      }
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+  const nameInput = document.getElementById('name');
+  const acInput = document.getElementById('account_code');
+  const suggestionBox = document.createElement('ul');
+  let currentFocus = -1;
+
+  Object.assign(suggestionBox.style, {
+    position: 'absolute',
+    border: '1px solid #ccc',
+    backgroundColor: 'white',
+    color : '#0f0f0f',
+    listStyleType: 'none',
+    padding: '0',
+    marginTop: '52px',
+    marginLeft: '112px',
+    width: '300px',
+    maxHeight: '150px',
+    overflowY: 'auto',
+    zIndex: '1000'
+  });
+
+  suggestionBox.hidden = true;
+  nameInput.parentNode.appendChild(suggestionBox);
+
+  function highlightItem(index) {
+    const items = suggestionBox.querySelectorAll('li');
+    items.forEach((item, i) => {
+      item.style.backgroundColor = i === index ? '#c7b7b7' : '#fff';
+    });
+  }
+
+  function fillFields(account) {
+    nameInput.value = `${account.Sub_code} - ${account.Sub_name}`;
+    document.getElementById('Sub_code').value = account.Sub_code;
+    document.getElementById('Sub_name').value = account.Sub_name;
+    document.getElementById('branch').value = account.Branch;
+
+    document.getElementById('Sub_code').readOnly = true;
+    document.getElementById('Sub_name').readOnly = true;
+    document.getElementById('branch').disabled = true;
+
+    suggestionBox.hidden = true;
+  }
+
+  function fetchSuggestions() {
+    const query = nameInput.value;
+    const query1 = acInput.value;
+
+    if (!query.length) {
+      suggestionBox.hidden = true;
+      return;
+    }
+
+    fetch(`/search_sub_account/?query=${query}&query1=${query1}`)
+      .then(response => response.json())
+      .then(data => {
+        suggestionBox.innerHTML = '';
+        currentFocus = -1;
+
+        data.forEach(account => {
+          const item = document.createElement('li');
+          item.style.padding = '5px';
+          item.style.cursor = 'pointer';
+          item.textContent = `${account.Sub_code} - ${account.Sub_name}`;
+          item.addEventListener('click', () => fillFields(account));
+          suggestionBox.appendChild(item);
+        });
+
+        suggestionBox.hidden = data.length === 0;
+      });
+  }
+
+  nameInput.addEventListener('input', fetchSuggestions);
+  acInput.addEventListener('input', fetchSuggestions);
+
+  nameInput.addEventListener('keydown', function (e) {
+    const items = suggestionBox.querySelectorAll('li');
+    if (suggestionBox.hidden || items.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      currentFocus = (currentFocus + 1) % items.length;
+      highlightItem(currentFocus);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      currentFocus = (currentFocus - 1 + items.length) % items.length;
+      highlightItem(currentFocus);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (currentFocus >= 0) items[currentFocus].click();
+    }
+  });
+
+  document.addEventListener('click', function (event) {
+    if (!nameInput.contains(event.target) && !suggestionBox.contains(event.target)) {
+      suggestionBox.hidden = true;
+    }
+  });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('success') === 'true') {
+      alert('Successfully Registered!');
+      const newUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const nameInput = document.getElementById('account_code');
+  const suggestionBox = document.createElement('ul');
+  let currentFocus = -1;
+
+  Object.assign(suggestionBox.style, {
+    position: 'absolute',
+    border: '1px solid #ccc',
+    backgroundColor: 'white',
+    color : '#0f0f0f',
+    listStyleType: 'none',
+    padding: '0',
+    marginTop: '52px',
+    marginLeft: '102px',
+    width: '300px',
+    maxHeight: '150px',
+    overflowY: 'auto',
+    zIndex: '1000'
+  });
+
+  suggestionBox.hidden = true;
+  nameInput.parentNode.appendChild(suggestionBox);
+
+  function highlightItem(index) {
+    const items = suggestionBox.querySelectorAll('li');
+    items.forEach((item, i) => {
+      item.style.backgroundColor = i === index ? '#c7b7b7' : '#fff';
+    });
+  }
+
+  function fillFields(account) {
+    const account_name = document.getElementById('account_name');
+    account_name.value = account.Ac_name;
+    document.getElementById('accountNature').value = account.Ac_nature;
+    document.getElementById('scheduleName').value = account.Sh_name;
+    nameInput.value = account.Pkac_code;
+    document.getElementById('Sub_code').value = (parseInt(account.Sub_code) + 1).toString().padStart(4, '0');
+
+    if (account.Sh_code) {
+      const Sh_select = document.getElementById('scheduleCode');
+      for (let option of Sh_select.options) {
+        if (option.value.startsWith(account.Sh_code)) {
+          option.selected = true;
+          if (typeof updateScheduleName === 'function') updateScheduleName();
+          break;
+        }
+      }
+    }
+
+    document.querySelectorAll('input[name="accountType"]').forEach(el => el.checked = false);
+    const selectedType = document.querySelector(`input[name="accountType"][value="${account.Ac_type}"]`);
+    if (selectedType) selectedType.checked = true;
+
+    document.getElementById('name').value = '';
+    document.getElementById('Sub_name').value = '';
+    document.getElementById('branch').value = '';
+
+    suggestionBox.hidden = true;
+  }
+
+  function fetchSuggestions() {
+    const query = nameInput.value;
+    if (!query.length) {
+      suggestionBox.hidden = true;
+      return;
+    }
+
+    fetch(`/search_s_account_code/?query=${query}`)
+      .then(response => response.json())
+      .then(data => {
+        suggestionBox.innerHTML = '';
+        currentFocus = -1;
+
+        data.forEach(account => {
+          const item = document.createElement('li');
+          item.style.padding = '5px';
+          item.style.cursor = 'pointer';
+          item.textContent = `${account.Pkac_code} - ${account.Ac_name}`;
+          item.addEventListener('click', () => fillFields(account));
+          suggestionBox.appendChild(item);
+        });
+
+        suggestionBox.hidden = data.length === 0;
+      });
+  }
+
+  nameInput.addEventListener('input', fetchSuggestions);
+
+  nameInput.addEventListener('keydown', function (e) {
+    const items = suggestionBox.querySelectorAll('li');
+    if (suggestionBox.hidden || items.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      currentFocus = (currentFocus + 1) % items.length;
+      highlightItem(currentFocus);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      currentFocus = (currentFocus - 1 + items.length) % items.length;
+      highlightItem(currentFocus);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (currentFocus >= 0) items[currentFocus].click();
+    }
+  });
+
+  document.addEventListener('click', function (event) {
+    if (!nameInput.contains(event.target) && !suggestionBox.contains(event.target)) {
+      suggestionBox.hidden = true;
+    }
+  });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const nameInput = document.getElementById('account_name');
+  const suggestionBox = document.createElement('ul');
+  let currentFocus = -1;
+
+  Object.assign(suggestionBox.style, {
+    position: 'absolute',
+    border: '1px solid #ccc',
+    backgroundColor: 'white',
+    color : '#0f0f0f',
+    listStyleType: 'none',
+    padding: '0',
+    marginTop: '52px',
+    marginLeft: '102px',
+    width: '300px',
+    maxHeight: '150px',
+    overflowY: 'auto',
+    zIndex: '1000'
+  });
+
+  suggestionBox.hidden = true;
+  nameInput.parentNode.appendChild(suggestionBox);
+
+  function highlightItem(index) {
+    const items = suggestionBox.querySelectorAll('li');
+    items.forEach((item, i) => {
+      item.style.backgroundColor = i === index ? '#c7b7b7' : '#fff';
+    });
+  }
+
+  function fillFields(account) {
+    const account_code = document.getElementById('account_code');
+    account_code.value = account.Pkac_code;
+
+    account_code.dispatchEvent(new Event('change'));
+
+    document.getElementById('accountNature').value = account.Ac_nature;
+    document.getElementById('scheduleName').value = account.Sh_name;
+    nameInput.value = account.Ac_name;
+    document.getElementById('Sub_code').value = (parseInt(account.Sub_code) + 1).toString().padStart(4, '0');
+
+
+    if (account.Sh_code) {
+        const Sh_select = document.getElementById('scheduleCode');
+        for (let option of Sh_select.options) {
+            if (option.value.startsWith(account.Sh_code)) {
+                option.selected = true;
+                if (typeof updateScheduleName === 'function') updateScheduleName();
+                break;
+            }
+        }
+    }
+
+
+    document.querySelectorAll('input[name="accountType"]').forEach(el => el.checked = false);
+    const selectedType = document.querySelector(`input[name="accountType"][value="${account.Ac_type}"]`);
+    if (selectedType) selectedType.checked = true;
+
+    document.getElementById('name').value = '';
+    document.getElementById('Sub_name').value = '';
+    document.getElementById('branch').value = '';
+
+    suggestionBox.hidden = true;
+  }
+
+  function fetchSuggestions() {
+    const query = nameInput.value;
+    if (!query.length) {
+      suggestionBox.hidden = true;
+      return;
+    }
+
+    fetch(`/search_s_account_name/?query=${query}`)
+      .then(response => response.json())
+      .then(data => {
+        suggestionBox.innerHTML = '';
+        currentFocus = -1;
+
+        data.forEach(account => {
+          const item = document.createElement('li');
+          item.style.padding = '5px';
+          item.style.cursor = 'pointer';
+          item.textContent = `${account.Pkac_code} - ${account.Ac_name}`;
+          item.addEventListener('click', () => fillFields(account));
+          suggestionBox.appendChild(item);
+        });
+
+        suggestionBox.hidden = data.length === 0;
+      });
+  }
+
+  nameInput.addEventListener('input', fetchSuggestions);
+
+  nameInput.addEventListener('keydown', function (e) {
+    const items = suggestionBox.querySelectorAll('li');
+    if (suggestionBox.hidden || items.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      currentFocus = (currentFocus + 1) % items.length;
+      highlightItem(currentFocus);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      currentFocus = (currentFocus - 1 + items.length) % items.length;
+      highlightItem(currentFocus);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (currentFocus >= 0) items[currentFocus].click();
+    }
+  });
+
+  document.addEventListener('click', function (event) {
+    if (!nameInput.contains(event.target) && !suggestionBox.contains(event.target)) {
+      suggestionBox.hidden = true;
+    }
+  });
+});
+
+function resetdetails() {
+  document.getElementById('accountNature').disabled = false;
+  document.getElementById('scheduleName').removeAttribute('readonly');
+  document.getElementById('scheduleCode').disabled = false;
+  document.querySelectorAll('input[name="accountType"]').forEach(el => el.disabled = false);
+  document.getElementById('Sub_name').removeAttribute('readonly');
+  document.getElementById('branch').disabled = false;
+}
+
+document.getElementById('branch').addEventListener('keydown', function(event) {
+      const submitButton = document.querySelector('button[name="submit"]');
+      if (event.key === 'Enter') {
+          event.preventDefault(); 
+          submitButton.focus();
+        }
+      });
+window.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.dropdown').forEach(item => {
+    const menu = item.querySelector('.dropdown-menu');
+    item.addEventListener('mouseenter', () => {
+      menu.style.display = 'block';
+    });
+    item.addEventListener('mouseleave', () => {
+      menu.style.display = 'none';
+    });
+    menu.style.display = 'none';
+  });
+});
+  </script>
+</body>
+</html>

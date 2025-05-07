@@ -1,0 +1,937 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Staff Registration</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(120deg, #e9d5c5, #613e27);
+      color: #2c3e50;
+      margin: 0;
+      padding: 0;
+    }
+
+    .header-title {
+      text-align: center;
+      font-size: 32px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-top: 40px;
+      margin-bottom: 20px;
+    }
+
+    #tabs {
+      width: 100%;
+      background-color: #d8ccc6;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      padding: 10px 0;
+    }
+
+    #tabs ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    #tabs li {
+      position: relative;
+    }
+
+    #tabs a {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #a58977;
+      border-radius: 10px;
+      text-decoration: none;
+      color: #091a25;
+      font-weight: 600;
+      transition: 0.3s ease;
+    }
+
+    #tabs a:hover {
+      background: #55473d;
+      color: #fff;
+    }
+
+    .dropdown {
+    position: relative;
+  }
+ 
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    background-color: #f5f5f5; /* or whatever fits your style */
+    padding: 10px;
+    border-radius: 5px;
+  }
+ 
+  .dropdown:hover .dropdown-menu{
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+   
+ 
+  .dropdown-menu li a {
+    display: block;
+    padding: 10px 20px;
+    color: #2c3e50;
+    background-color: #f2f9fb;
+    border-top: 1px solid #dfe6e9;
+    text-decoration: none;
+  }
+ 
+  .dropdown-menu li a:hover {
+    background-color: #2980b9;
+    color: white;
+  }
+
+    .header {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #0f0f0f;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+      position: relative;
+      z-index: 10;
+      margin-top: 10px;
+    }
+
+    hr {
+      border: none;
+      border-top: 2px solid #3498db;
+      margin: 10px auto 25px auto;
+      width: 60%;
+    }
+
+    .form-container {
+      max-width: 1100px;
+      margin: 120px auto 40px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .form-container h2 {
+      font-size: 23px;
+      font-weight: 900;
+      text-align: center;
+      color: white;
+      margin-bottom: 20px;
+      background-color: #795548;
+      padding: 10px;
+    }
+
+    .name-help-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .name-help-group label {
+      width: 15%;
+      font-weight: bold;
+    }
+
+    .name-help-group input[type="text"] {
+      width: 25%;
+      padding: 4px 6px;
+      font-size: 12px;
+      border: 1px solid #a1887f;
+      border-radius: 5px;
+      vertical-align: middle;
+    }
+
+    label {
+      display: inline-block;
+      width: 25%;
+      font-weight: bold;
+      margin-bottom: 10px; /* change the space between labels */
+    }
+
+    input, select {
+      width: 70%;
+      padding: 4px 6px;
+      font-size: 12px;
+      border: 1px solid #a1887f;
+      border-radius: 5px;
+      vertical-align: middle;
+    }
+
+    .section {
+      margin-top: 20px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .col {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    button {
+      margin-top: 20px;
+      background-color: #6d4c41;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #5d4037;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 25px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .radio-inline {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: normal;
+}
+
+    .radio-group label {
+      font-weight: normal;
+      margin-bottom: 0;
+    }
+
+    h3 {
+      background-color: #795548;
+      color: white;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    .btn {
+      width: 20%;
+      padding: 10px;
+      background: linear-gradient(to right, #6f4e37, #4b2e2e);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    .image-input-wrapper {
+  position: relative;
+  width: 100%;
+  height: 130px;
+  border: 1px dashed #a1887f;
+  border-radius: 5px;
+  background-color: #fdfdfd;
+  overflow: hidden;
+}
+
+.image-input-wrapper input[type="file"] {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.image-input-wrapper img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: none;
+  z-index: 1;
+}
+.upload-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.image-box {
+  width: 100px;
+  height: 100px;
+  border: 5px solid #795548;
+  border-radius: 5px;
+  background-color: #fdfdfd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.inline-label-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .inline-label-input label {
+    white-space: nowrap;
+    min-width: 50px;
+  }
+  .inline-label-input input {
+    flex: 1;
+  }
+
+  .capture-button {
+  font-size: 14px;
+  padding: 5px 12px;
+  margin-top: 6px;
+  border: 1px solid #ccc;
+  background-color: #c5afaf;
+  color: #333;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.capture-button:hover {
+  background-color: #a79999;
+}
+
+  </style>
+</head>
+<body>
+    <hr />
+    <div id="tabs">
+      <div class="header">
+        <span>Branch: {{ user.B_id.Branch_name }}</span>
+        <span>User: {{ user.Username }}</span>
+        <span>Date: </span>
+        <span>Time: </span>
+      </div>
+      <ul>
+        <li><a href="{% url 'index' user.id %}"><span>Home</span></a></li>
+        <li class="dropdown">
+          <a href="#"><span>Admin</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'user_reg' user.id %}"><pre> User Registration </pre></a></li>
+            <li><a href="{% url 'change_password' user.id %}"><pre>  Change Password  </pre></a></li>
+            <li><a href="{% url 'staff_registration' user.id %}"><pre>Staff Registration </pre></a></li>
+          </ul>
+        </li>
+        <li><a href="#"><span>Master</span></a></li>
+        <li><a href="#"><span>Deposit</span></a></li>
+        <li><a href="#"><span>Gold Loan</span></a></li>
+        <li class="dropdown">
+          <a href="#"><span>Accounts</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'account_schedule_form' user.id %}"><pre>Account Registration   </pre></a></li>
+            <li><a href="{% url 'sub_ledger' user.id %}"><pre>SubLedger Registration </pre></a></li>
+            <li><a href="{% url 'cash_book_entry' user.id %}"><pre>    Cashbook Entry     </pre></a></li>
+            <li><a href="{% url 'bankbook' user.id %}"><pre>    Bankbook Entry     </pre></a></li>
+            <li><a href="{% url 'journal' user.id %}"><pre>    Journal Entry      </pre></a></li>
+          </ul>
+        </li>
+        <li><a href="#"><span>Loans</span></a></li>
+        <li><a href="{% url 'logout' %}"><span>Logout</span></a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="form-container">
+    <h2>Staff Registration</h2>
+ 
+    {% if messages %}
+      <ul style="width: 60%; margin: auto; padding: 10px; list-style: none;">
+        {% for message in messages %}
+          {% if message.tags == 'success' %}
+            <script>alert("{{ message }}");</script>
+          {% else %}
+            <li style="color: red; font-weight: bold; text-align: center;">{{ message }}</li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+ 
+    <form id="staffForm" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="hidden" id="staff_id" name="staff_id" value="{{ staff_id }}">
+      {{ form.non_field_errors }}
+ 
+      <div class="col">
+        <div class="form-group name-help-group" style="position: relative;">
+          <label for="name">Name Help:</label>
+          <input type="text" id="nameHelp" placeholder="Search or edit user" oninput="toggleSaveUpdateButton()" autocomplete="off">
+        </div>
+      </div>
+ 
+      <div class="section">
+        <h3>Staff Details</h3>
+        <div class="row">
+          <div class="col">
+            <label for="name">Name:</label>
+            <input type="text" name="name" id="id_name" value="{{ form.name.value|default_if_none:'' }}">
+            <div class="error">{{ form.name.errors }}</div>
+          </div>
+          <div class="col">
+            <label for="dob">Date of Birth:</label>
+            <input type="date" name="dob" id="dob" value="{{ form.dob.value|default_if_none:'' }}">
+            <div class="error">{{ form.dob.errors }}</div>
+          </div>
+        </div><br>
+ 
+        <div class="row">
+          <div class="col">
+            <div class="radio-group">
+              <label><b>Gender:</b></label>
+              <label class="radio-inline">
+                <input type="radio" name="gender" value="M" {% if form.gender.value == "M" %}checked{% endif %} required> Male
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="gender" value="F" {% if form.gender.value == "F" %}checked{% endif %}> Female
+              </label>
+            </div>
+            <div class="error">{{ form.gender.errors }}</div>
+          </div>
+          <div class="col">
+            <div class="radio-group">
+              <label><b>Marital Status:</b></label>
+              <label class="radio-inline">
+                <input type="radio" name="marital_status" value="Single" {% if form.marital_status.value == "Single" %}checked{% endif %} required> Single
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="marital_status" value="Married" {% if form.marital_status.value == "Married" %}checked{% endif %}> Married
+              </label>
+            </div>
+            <div class="error">{{ form.marital_status.errors }}</div>
+          </div>
+        </div><br>
+     
+        <div class="row">
+          <div class="col">
+            <label for="relation">Relation:</label>
+            <input type="text" name="relation" id="relation" value="{{ form.relation.value|default_if_none:'' }}">
+            <div class="error">{{ form.relation.errors }}</div>
+          </div>
+          <div class="col">
+            <label for="relation_name">Relation Name:</label>
+            <input type="text" name="relation_name" id="relation_name" value="{{ form.relation_name.value|default_if_none:'' }}">
+            <div class="error">{{ form.relation_name.errors }}</div>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="section">
+        <h3>Photo & Signature</h3>
+        <div class="row">
+     
+          <div class="col upload-block">
+            <div class="image-box">
+              <img id="photoPreview" src="{% static 'default-photo.png' %}" alt="Photo Preview"  required/>
+            </div>
+            <input type="file" name="photo" id="id_photo" accept="image/*">
+            <div class="error">{{ form.photo.errors }}</div>
+          </div>
+     
+          <div class="col upload-block">
+            <div class="image-box" style="position: relative;">
+              <video id="photoVideo" width="200" autoplay style="display: none;"></video>
+              <canvas id="photoCanvas" style="display: none;"></canvas>
+              <img id="capturedPhotoPreview" src="{% static 'default-photo.png' %}" alt="Captured Photo Preview" />
+            </div>
+            <button type="button" onclick="startCapture()" class="capture-button">📸 Capture</button>
+            <input type="hidden" name="photo_captured" id="photoCaptured">
+          </div>
+     
+          <div class="col upload-block">
+            <div class="image-box">
+              <img id="signaturePreview" src="{% static 'default-signature.png' %}" alt="Signature Preview" required />
+            </div>
+            <input type="file" name="signature" id="id_signature" accept="image/*">
+            <div class="error">{{ form.signature.errors }}</div>
+          </div>
+     
+        </div>
+      </div>
+           
+<div class="section">
+  <h3>Address Details</h3>
+  <div class="row">
+    <div class="col">
+      <label for="house_name">House Name:</label>
+      <input type="text" name="house_name" id="house_name" value="{{ form.house_name.value|default_if_none:'' }}">
+      <div class="error">{{ form.house_name.errors }}</div>
+    </div>
+    <div class="col">
+      <label for="house_no">House No:</label>
+      <input type="text" name="house_no" id="house_no" value="{{ form.house_no.value|default_if_none:'' }}" pattern="\d+" title="Enter a numeric house number" required>
+
+      <div class="error">{{ form.house_no.errors }}</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">{{ form.place.label_tag }} {{ form.place }}</div>
+    <div class="col">{{ form.post_office.label_tag }} {{ form.post_office }}</div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <label for="pincode">Pincode:</label>
+      <input type="text" name="pincode" id="pincode" value="{{ form.pincode.value|default_if_none:'' }}" pattern="\d{6}" maxlength="6" title="Enter 6 digit pincode" required>
+      <div class="error">{{ form.pincode.errors }}</div>
+    </div>
+    <div class="col">{{ form.city.label_tag }} {{ form.city }}</div>
+  </div>
+
+<div class="row">
+  <div class="col inline-label-input">
+    <label for="district">District:</label>
+    <input type="text" name="district" id="district" value="{{ form.district.value|default_if_none:'' }}" required>
+  </div>
+  <div class="col inline-label-input">
+    <label for="state">State:</label>
+    <input type="text" name="state" id="state" value="{{ form.state.value|default_if_none:'' }}">
+  </div>
+  <div class="col inline-label-input">
+    <label for="country">Country:</label>
+    <input type="text" name="country" id="country" value="{{ form.country.value|default_if_none:'' }}">
+  </div>
+</div>
+<!-- Contact Section -->
+<div class="section">
+  <h3>Contact</h3>
+  <div class="row">
+    <div class="col">
+      <label for="mobile1">Mobile 1:</label>
+      <input type="text" name="mobile1" id="mobile1" value="{{ form.mobile1.value|default_if_none:'' }}" pattern="\d{10}" maxlength="10" title="Enter 10 digit mobile number" required>
+      <div class="error">{{ form.mobile1.errors }}</div>
+    </div>
+    <div class="col">
+      <label for="mobile2">Mobile 2:</label>
+      <input type="text" name="mobile2" id="mobile2" value="{{ form.mobile2.value|default_if_none:'' }}" pattern="\d{10}" maxlength="10" title="Enter 10 digit mobile number">
+      <div class="error">{{ form.mobile2.errors }}</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <label for="phone">Phone No:</label>
+      <input type="text" name="phone" id="phone" value="{{ form.phone.value|default_if_none:'' }}" pattern="\d{10}" maxlength="10" title="Enter 10 digit phone number">
+      <div class="error">{{ form.phone.errors }}</div>
+    </div>
+    <div class="col">
+      <label for="id_email">Email:</label>
+      <input type="email" name="email" id="id_email" value="{{ form.email.value|default_if_none:'' }}" required>
+    </div>    
+  </div>
+</div>
+
+      <div style="display: flex; justify-content: center; gap: 20px;">
+        <button type="submit" id ="saveUpdateButton" name="action" value="submit">Save</button>
+        <button type="reset" value="reset" id="reset">Reset</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const dropdowns = document.querySelectorAll('.dropdown');
+      dropdowns.forEach(drop => {
+        const link = drop.querySelector('a');
+        const menu = drop.querySelector('.dropdown-menu');
+        menu.style.display = 'none';
+
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          document.querySelectorAll('.dropdown-menu').forEach(d => {
+            if (d !== menu) d.style.display = 'none';
+          });
+          menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.dropdown')) {
+          document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            menu.style.display = 'none';
+          });
+        }
+      });
+
+      function updateDateTime() {
+  const now = new Date();
+  const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+  const timeOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true };
+
+  document.querySelector('.header span:nth-child(3)').textContent = 'Date: ' + now.toLocaleDateString('en-GB', dateOptions);
+  document.querySelector('.header span:nth-child(4)').textContent = 'Time: ' + now.toLocaleTimeString('en-GB', timeOptions);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.dropdown').forEach(item => {
+    const menu = item.querySelector('.dropdown-menu');
+    item.addEventListener('mouseenter', () => {
+      menu.style.display = 'block';
+    });
+    item.addEventListener('mouseleave', () => {
+      menu.style.display = 'none';
+    });
+    menu.style.display = 'none';
+  });
+});
+updateDateTime();
+setInterval(updateDateTime, 1000);
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const nameInput = document.getElementById('nameHelp');
+  const suggestionBox = document.createElement('ul');
+  let currentFocus = -1;
+
+  // Style the suggestion box
+  Object.assign(suggestionBox.style, {
+    position: 'absolute',
+    border: '1px solid #ccc',
+    backgroundColor: 'white',
+    color : '#0f0f0f',
+    listStyleType: 'none',
+    padding: '0',
+    marginTop: '72px',
+    marginLeft: '162px',
+    width: '300px',
+    maxHeight: '150px',
+    overflowY: 'auto',
+    zIndex: '1000'
+  });
+
+  suggestionBox.hidden = true;
+  nameInput.parentNode.appendChild(suggestionBox);
+
+  function highlightItem(index) {
+    const items = suggestionBox.querySelectorAll('li');
+    items.forEach((item, i) => {
+      item.style.backgroundColor = i === index ? '#c7b7b7' : '#fff';
+    });
+  }
+
+  function fillForm(account) {
+    nameInput.value = account.name;
+    document.getElementById('staff_id').value = account.id;
+    toggleSaveUpdateButton();
+    document.getElementById('id_name').value = account.name;
+    document.querySelector('[name="dob"]').value = account.dob || '';
+    document.querySelector('[name="relation"]').value = account.relation || '';
+    document.querySelector('[name="relation_name"]').value = account.relation_name || '';
+    document.querySelector('[name="house_name"]').value = account.house_name || '';
+    document.querySelector('[name="house_no"]').value = account.house_no || '';
+    document.querySelector('[name="place"]').value = account.place || '';
+    document.querySelector('[name="post_office"]').value = account.post_office || '';
+    document.querySelector('[name="pincode"]').value = account.pincode || '';
+    document.querySelector('[name="city"]').value = account.city || '';
+    document.querySelector('[name="district"]').value = account.district || '';
+    document.querySelector('[name="state"]').value = account.state || '';
+    document.querySelector('[name="country"]').value = account.country || '';
+    document.querySelector('[name="mobile1"]').value = account.mobile1 || '';
+    document.querySelector('[name="mobile2"]').value = account.mobile2 || '';
+    document.querySelector('[name="phone"]').value = account.phone || '';
+    document.querySelector('[name="email"]').value = account.email || '';
+
+    const genderRadio = document.querySelector(`input[name="gender"][value="${account.gender}"]`);
+    if (genderRadio) genderRadio.checked = true;
+
+    const maritalRadio = document.querySelector(`input[name="marital_status"][value="${account.marital_status}"]`);
+    if (maritalRadio) maritalRadio.checked = true;
+
+    document.getElementById('photoPreview').src = account.photo || '{% static "default-photo.png" %}';
+    document.getElementById('photoPreview').style.display = 'block';
+
+    document.getElementById('signaturePreview').src = account.signature || '{% static "default-signature.png" %}';
+    document.getElementById('signaturePreview').style.display = 'block';
+
+    suggestionBox.hidden = true;
+  }
+  nameInput.addEventListener('input', function () {
+    const query = nameInput.value;
+    if (query.length === 0) {
+      suggestionBox.hidden = true;
+      return;
+    }
+
+    const url = "{% url 'get_staff_names' user.id %}";
+fetch(`${url}?query=${query}`)  
+  .then(response => response.json())
+  .then(data => {
+    suggestionBox.innerHTML = '';
+    currentFocus = -1;
+
+
+        data.forEach(account => {
+          const item = document.createElement('li');
+          item.style.padding = '5px';
+          item.style.cursor = 'pointer';
+          item.textContent = account.name;
+          item.addEventListener('click', () => fillForm(account));
+          suggestionBox.appendChild(item);
+        });
+
+        suggestionBox.hidden = data.length === 0;
+      });
+  });
+
+
+  nameInput.addEventListener('keydown', function (e) {
+    const items = suggestionBox.querySelectorAll('li');
+    if (suggestionBox.hidden || items.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      currentFocus = (currentFocus + 1) % items.length;
+      highlightItem(currentFocus);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      currentFocus = (currentFocus - 1 + items.length) % items.length;
+      highlightItem(currentFocus);
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (currentFocus >= 0) items[currentFocus].click();
+    }
+  });
+
+
+  document.addEventListener('click', function (event) {
+    if (!nameInput.contains(event.target) && !suggestionBox.contains(event.target)) {
+      suggestionBox.hidden = true;
+    }
+  });
+});
+
+function previewImage(inputId, previewId) {
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(previewId);
+
+  input.addEventListener("change", function () {
+    const file = input.files[0];
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    } else {
+      preview.src = "#";
+      preview.style.display = "none";
+    }
+  });
+}
+
+function setupInlineImagePreview(inputId, imgId) {
+  const input = document.getElementById(inputId);
+  const img = document.getElementById(imgId);
+
+  input.addEventListener('change', function () {
+    const file = this.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        img.src = e.target.result;
+        img.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    } else {
+      img.src = '';
+      img.style.display = 'none';
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  setupInlineImagePreview('id_photo', 'photoPreview');
+  setupInlineImagePreview('id_signature', 'signaturePreview');
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  const forminputs = Array.from(document.querySelectorAll('input, select, textarea'));
+
+  forminputs.forEach((input, index) => {
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const nextinput = forminputs[index + 1];
+        if (nextinput) {
+          nextinput.focus();
+        }
+      }
+    });
+  });
+});
+
+document.getElementById("staffForm").addEventListener("submit", function (event) {
+    const emailInput = document.getElementById("id_email");
+    const email = emailInput.value.trim();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple regex for email validation
+
+    // Check if the email is valid
+    if (!emailPattern.test(email)) {
+        event.preventDefault();  // Prevent form submission
+        alert("Please enter a valid email address (e.g., name@example.com).");
+        emailInput.focus(); // Focus on the email input for correction
+    }
+});
+
+// Your existing code for the dropdowns, name input, etc.
+document.addEventListener('DOMContentLoaded', function () {
+  const dropdowns = document.querySelectorAll('.dropdown');
+  // ... (rest of the code)
+});
+
+document.getElementById('id_photo').addEventListener('keydown', function(event) {
+  const add_Input = document.getElementById('id_photo');
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    add_Input.click();
+}
+});
+document.getElementById('id_signature').addEventListener('keydown', function(event) {
+  const add_Input = document.getElementById('id_signature');
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    add_Input.click();
+}
+});
+document.getElementById("reset").addEventListener("click", function(e) {
+  const photoInput = document.getElementById("id_photo");
+  const newPhotoInput = photoInput.cloneNode(true);
+  photoInput.parentNode.replaceChild(newPhotoInput, photoInput);
+  setupInlineImagePreview("id_photo", "photoPreview");
+
+  const signatureInput = document.getElementById("id_signature");
+  const newSignatureInput = signatureInput.cloneNode(true);
+  signatureInput.parentNode.replaceChild(newSignatureInput, signatureInput);
+  setupInlineImagePreview("id_signature", "signaturePreview");
+
+  document.getElementById("photoPreview").src = "{% static 'default-photo.png' %}";
+  document.getElementById("signaturePreview").src = "{% static 'default-signature.png' %}";
+  const saveUpdateButton = document.getElementById('saveUpdateButton');
+  saveUpdateButton.textContent = 'Save';
+  saveUpdateButton.value = 'submit';
+});
+
+
+document.getElementById('id_relation_name').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      document.getElementById('id_photo').focus();
+    }
+  });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const fields = ["house_no", "mobile1", "mobile2", "phone", "pincode"];
+    fields.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener("input", () => {
+          el.value = el.value.replace(/\D/g, ""); // remove non-digits
+        });
+      }
+    });
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const numberFields = ["house_no", "pincode", "mobile1", "mobile2", "phone"];
+    numberFields.forEach(id => {
+      const input = document.getElementById(id);
+      if (input) {
+        input.addEventListener("input", function (e) {
+          // Remove all non-digit characters
+          this.value = this.value.replace(/\D/g, '');
+        });
+      }
+    });
+  });
+
+  function startCapture() {
+    const video = document.getElementById('photoVideo');
+    const canvas = document.getElementById('photoCanvas');
+    const preview = document.getElementById('capturedPhotoPreview');
+    const input = document.getElementById('photoCaptured');
+
+    navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+        video.style.display = 'block';
+        video.srcObject = stream;
+
+        video.onclick = () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+            const dataURL = canvas.toDataURL('image/png');
+            input.value = dataURL;
+            preview.src = dataURL;
+            video.style.display = 'none';
+            stream.getTracks().forEach(track => track.stop());
+        };
+    }).catch(err => {
+        alert("Camera access failed.");
+        console.error(err);
+    });
+}
+function toggleSaveUpdateButton() {
+  const staffId = document.getElementById('staff_id').value;
+  const saveUpdateButton = document.getElementById('saveUpdateButton');
+  if (staffId) {
+    saveUpdateButton.textContent = 'Update';
+    saveUpdateButton.value = 'update';
+  } else {
+    saveUpdateButton.textContent = 'Save';
+    saveUpdateButton.value = 'submit';
+  }
+}
+
+document.getElementById("photo").addEventListener("change", function () {
+    if (this.files.length > 0) {
+        document.getElementById("photo-filename").textContent = "Selected file: " + this.files[0].name;
+    }
+});
+
+document.getElementById("signature").addEventListener("change", function () {
+    if (this.files.length > 0) {
+        document.getElementById("signature-filename").textContent = "Selected file: " + this.files[0].name;
+    }
+});
+  </script>
+</body>
+</html>
+
